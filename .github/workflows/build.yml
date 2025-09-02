@@ -1,0 +1,35 @@
+name: Build Fabric Mod
+
+# いつ動かすか
+on:
+  push:        # コードをpushしたとき
+    branches: [ "main" ]   # mainブランチにpushされたとき
+  pull_request: # PRを作ったとき
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # GitHubのUbuntuサーバでビルドする
+
+    steps:
+      # 1. コードをチェックアウト（取得）
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. JDK 21 をセットアップ（Fabric 1.21.4に必要）
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      # 3. Gradle でビルド実行
+      - name: Build with Gradle
+        run: ./gradlew build --stacktrace
+
+      # 4. 成果物をアップロード（あとでダウンロードできるようにする）
+      - name: Upload JAR
+        uses: actions/upload-artifact@v3
+        with:
+          name: dragonwings-jar
+          path: build/libs/*.jar
